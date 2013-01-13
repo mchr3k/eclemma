@@ -14,6 +14,7 @@ package com.mountainminds.eclemma.internal.ui.dialogs;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -29,6 +30,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.mountainminds.eclemma.core.ICorePreferences;
 import com.mountainminds.eclemma.internal.ui.ContextHelp;
 import com.mountainminds.eclemma.internal.ui.EclEmmaUIPlugin;
 import com.mountainminds.eclemma.internal.ui.UIMessages;
@@ -58,6 +60,7 @@ public class CoveragePreferencePage extends FieldEditorPreferencePage implements
     createSessionManagementGroup(result);
     createDefaultScopeGroup(result);
     createCoverageRuntimeGroup(result);
+    createAnalysisGroup(result);
 
     // Links:
     createLink(result, UIMessages.CoveragePreferencesDecoratorsLink_label,
@@ -132,6 +135,29 @@ public class CoveragePreferencePage extends FieldEditorPreferencePage implements
     Label hint = new Label(group, SWT.WRAP);
     GridDataFactory.fillDefaults().span(2, 1).applyTo(hint);
     hint.setText(UIMessages.CoveragePreferencesCoverageRuntime_message);
+    adjustGroupLayout(group);
+  }
+
+  private void createAnalysisGroup(final Composite parent) {
+    FieldEditor editor;
+    final Group group = createGroup(parent,
+        UIMessages.CoveragePreferencesCoverageAnalysis_title);
+    editor = new ComboFieldEditor(
+        UIPreferences.PREF_ANALYSIS_SOURCEDIRECTIVES,
+        UIMessages.CoveragePreferencesSourceDirectives_label,
+        new String[][] {
+            new String[] {
+                UIMessages.CoveragePreferencesSourceDirectives_option_disable,
+                ICorePreferences.PREF_AGENT_SOURCEDIRECTIVES_DISABLE },
+            new String[] {
+                UIMessages.CoveragePreferencesSourceDirectives_option_enable,
+                ICorePreferences.PREF_AGENT_SOURCEDIRECTIVES_ENABLE },
+            new String[] {
+                UIMessages.CoveragePreferencesSourceDirectives_option_enable_requirecomment,
+                ICorePreferences.PREF_AGENT_SOURCEDIRECTIVES_ENABLE_REQUIRECOMMENT } },
+        group);
+    addField(editor);
+    editor.fillIntoGrid(group, 2);
     adjustGroupLayout(group);
   }
 

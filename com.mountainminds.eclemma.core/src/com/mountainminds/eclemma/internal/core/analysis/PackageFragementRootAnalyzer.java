@@ -18,11 +18,17 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
+import org.jacoco.core.analysis.IDirectivesParser.SourceFileDirectivesParser;
 import org.jacoco.core.data.ExecutionDataStore;
+import org.jacoco.core.data.ISourceFileLocator;
 
 import com.mountainminds.eclemma.core.EclEmmaStatus;
+import com.mountainminds.eclemma.core.ICorePreferences;
+import com.mountainminds.eclemma.internal.core.EclEmmaCorePlugin;
+import com.mountainminds.eclemma.internal.core.SessionExporter;
 
 /**
  * Analyzes the class files that belong to given package fragment roots. This
@@ -33,10 +39,14 @@ final class PackageFragementRootAnalyzer {
 
   private final ExecutionDataStore executiondata;
   private final Map<Object, AnalyzedNodes> cache;
+  private ICorePreferences preferences;
 
   PackageFragementRootAnalyzer(final ExecutionDataStore executiondata) {
     this.executiondata = executiondata;
     this.cache = new HashMap<Object, AnalyzedNodes>();
+
+    EclEmmaCorePlugin corePlugin = EclEmmaCorePlugin.getInstance();
+    preferences = corePlugin.getPreferences();
   }
 
   AnalyzedNodes analyze(final IPackageFragmentRoot root) throws CoreException {
@@ -59,7 +69,18 @@ final class PackageFragementRootAnalyzer {
       }
 
       final CoverageBuilder builder = new CoverageBuilder();
-      final Analyzer analyzer = new Analyzer(executiondata, builder);
+
+      SourceFileDirectivesParser directivesParser = null;
+      ISourceFileLocator sourceFileLocator = createSourceFileLocator(root);
+      if (sourceFileLocator != null) {
+        boolean requireComment = ICorePreferences.PREF_AGENT_SOURCEDIRECTIVES_ENABLE_REQUIRECOMMENT
+            .equals(preferences.getAnalysisSourceDirectives());
+        directivesParser = new SourceFileDirectivesParser(sourceFileLocator,
+            requireComment);
+      }
+
+      final Analyzer analyzer = new Analyzer(executiondata, builder,
+          directivesParser);
       new ResourceTreeWalker(analyzer).walk(location);
       nodes = new AnalyzedNodes(builder.getClasses(), builder.getSourceFiles());
       cache.put(location, nodes);
@@ -67,6 +88,16 @@ final class PackageFragementRootAnalyzer {
     } catch (Exception e) {
       throw new CoreException(EclEmmaStatus.BUNDLE_ANALYSIS_ERROR.getStatus(
           root.getElementName(), location, e));
+    }
+  }
+
+  private ISourceFileLocator createSourceFileLocator(IPackageFragmentRoot root)
+      throws JavaModelException {
+    if (ICorePreferences.PREF_AGENT_SOURCEDIRECTIVES_DISABLE.equals(preferences
+        .getAnalysisSourceDirectives())) {
+      return null;
+    } else {
+      return SessionExporter.createSourceFileLocator(root);
     }
   }
 

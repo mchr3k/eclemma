@@ -159,6 +159,10 @@ public class DefaultScopeFilterTest {
       return null;
     }
 
+    public String getAnalysisSourceDirectives() {
+      return null;
+    }
+
   }
 
   private <E> Set<E> set(E... elements) {

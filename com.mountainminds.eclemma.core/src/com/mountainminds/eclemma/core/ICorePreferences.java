@@ -61,6 +61,10 @@ public interface ICorePreferences {
       return AGENT_DEFAULTS.getExclClassloader();
     }
 
+    public String getAnalysisSourceDirectives() {
+      return PREF_AGENT_SOURCEDIRECTIVES_DISABLE;
+    }
+
   };
 
   /**
@@ -128,5 +132,16 @@ public interface ICorePreferences {
    * @see WildcardMatcher
    */
   public String getAgentExclClassloader();
+
+  public static final String PREF_AGENT_SOURCEDIRECTIVES_DISABLE = "disable"; //$NON-NLS-1$
+  public static final String PREF_AGENT_SOURCEDIRECTIVES_ENABLE = "enable"; //$NON-NLS-1$
+  public static final String PREF_AGENT_SOURCEDIRECTIVES_ENABLE_REQUIRECOMMENT = "enable_requirecomment"; //$NON-NLS-1$
+
+  /**
+   * Determines whether source directives are enabled.
+   * 
+   * @return The current source directives setting.
+   */
+  public String getAnalysisSourceDirectives();
 
 }

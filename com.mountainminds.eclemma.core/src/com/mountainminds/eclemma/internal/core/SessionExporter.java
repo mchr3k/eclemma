@@ -35,10 +35,10 @@ import org.eclipse.jdt.core.formatter.IndentManipulation;
 import org.eclipse.osgi.util.NLS;
 import org.jacoco.core.analysis.IBundleCoverage;
 import org.jacoco.core.data.ExecutionDataWriter;
+import org.jacoco.core.data.ISourceFileLocator;
 import org.jacoco.report.FileMultiReportOutput;
 import org.jacoco.report.IReportGroupVisitor;
 import org.jacoco.report.IReportVisitor;
-import org.jacoco.report.ISourceFileLocator;
 import org.jacoco.report.ZipMultiReportOutput;
 import org.jacoco.report.csv.CSVFormatter;
 import org.jacoco.report.html.HTMLFormatter;
@@ -102,6 +102,7 @@ public class SessionExporter implements ISessionExporter {
     monitor.beginTask(
         NLS.bind(CoreMessages.ExportingSession_task, session.getDescription()),
         work * 2);
+
     final SessionAnalyzer analyzer = new SessionAnalyzer();
     final IJavaModelCoverage modelCoverage = analyzer.processSession(session,
         new SubProgressMonitor(monitor, work));
@@ -110,6 +111,7 @@ public class SessionExporter implements ISessionExporter {
         .visitInfo(analyzer.getSessionInfos(), analyzer.getExecutionData());
     final IReportGroupVisitor modelgroup = formatter.visitGroup(session
         .getDescription());
+
     for (IJavaProject project : modelCoverage.getProjects()) {
       final IReportGroupVisitor projectgroup = modelgroup.visitGroup(project
           .getElementName());
@@ -150,8 +152,8 @@ public class SessionExporter implements ISessionExporter {
     throw new AssertionError("Unexpected format " + format); //$NON-NLS-1$
   }
 
-  private ISourceFileLocator createSourceFileLocator(IPackageFragmentRoot root)
-      throws JavaModelException {
+  public static ISourceFileLocator createSourceFileLocator(
+      IPackageFragmentRoot root) throws JavaModelException {
     if (root.getKind() == IPackageFragmentRoot.K_SOURCE) {
       return new SourceFolderSourceFileLocator(root);
     } else {

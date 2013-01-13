@@ -49,7 +49,10 @@ public class UIPreferences extends AbstractPreferenceInitializer {
       + ".agent_excludes"; //$NON-NLS-1$ 
 
   public static final String PREF_AGENT_EXCLCLASSLOADER = EclEmmaUIPlugin.ID
-      + ".agent_exclclassloader"; //$NON-NLS-1$ 
+      + ".agent_exclclassloader"; //$NON-NLS-1$
+
+  public static final String PREF_ANALYSIS_SOURCEDIRECTIVES = EclEmmaUIPlugin.ID
+      + ".analysis_sourcedirectives"; //$NON-NLS-1$
 
   public static final ICorePreferences CORE_PREFERENCES = new ICorePreferences() {
     public boolean getActivateNewSessions() {
@@ -85,6 +88,10 @@ public class UIPreferences extends AbstractPreferenceInitializer {
     public String getAgentExclClassloader() {
       return getPreferenceStore().getString(PREF_AGENT_EXCLCLASSLOADER);
     }
+
+    public String getAnalysisSourceDirectives() {
+      return getPreferenceStore().getString(PREF_ANALYSIS_SOURCEDIRECTIVES);
+    }
   };
 
   public void initializeDefaultPreferences() {
@@ -107,6 +114,8 @@ public class UIPreferences extends AbstractPreferenceInitializer {
         ICorePreferences.DEFAULT.getAgentExcludes());
     pref.setDefault(PREF_AGENT_EXCLCLASSLOADER,
         ICorePreferences.DEFAULT.getAgentExclClassloader());
+    pref.setDefault(PREF_ANALYSIS_SOURCEDIRECTIVES,
+        ICorePreferences.DEFAULT.getAnalysisSourceDirectives());
   }
 
   private static IPreferenceStore getPreferenceStore() {
